@@ -1,0 +1,22 @@
+{
+  "measuringworth_british": {
+    "count": 688,
+    "start": "1258-01-01",
+    "end": "1945-01-01"
+  },
+  "measuringworth_london": {
+    "count": 307,
+    "start": "1718-01-01",
+    "end": "2024-01-01"
+  },
+  "worldbank": {
+    "count": 780,
+    "start": "1960-01-01",
+    "end": "2024-12-01"
+  },
+  "yahoo_finance": {
+    "count": 196,
+    "start": "2025-01-02",
+    "end": "2025-10-10"
+  }
+}

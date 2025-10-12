@@ -1,0 +1,77 @@
+{
+  "backfill_sources": {
+    "measuringworth_british": {
+      "enabled": true,
+      "granularity": "annual",
+      "series": "British",
+      "date_range": {
+        "start": "1257-01-01",
+        "end": "1945-01-01"
+      },
+      "url": "https://www.measuringworth.com/datasets/gold/",
+      "requires_api_key": false,
+      "notes": "British Official Price (1257-1945) - oldest available data"
+    },
+    "measuringworth_london": {
+      "enabled": true,
+      "granularity": "annual",
+      "series": "london",
+      "date_range": {
+        "start": "1718-01-01",
+        "end": "2023-01-01"
+      },
+      "url": "https://www.measuringworth.com/datasets/gold/",
+      "requires_api_key": false,
+      "notes": "London Market Price (1718-2023)"
+    },
+    "worldbank": {
+      "enabled": true,
+      "granularity": "monthly",
+      "date_range": {
+        "start": "1960-01-01",
+        "end": "auto"
+      },
+      "url": "https://www.worldbank.org/en/research/commodity-markets",
+      "requires_api_key": false,
+      "notes": "World Bank Commodity Prices - Gold (PGOLD) in USD per troy ounce. Monthly data from 1960-present. No API key required."
+    },
+    "fred": {
+      "enabled": false,
+      "granularity": "daily",
+      "date_range": {
+        "start": "1968-04-01",
+        "end": "auto"
+      },
+      "url": "https://fred.stlouisfed.org/series/GOLDAMGBD228NLBM",
+      "requires_api_key": true,
+      "notes": "Federal Reserve Economic Data - Gold Fixing Price in London (1968-present). Daily data. Requires FRED_API_KEY environment variable."
+    },
+    "yahoo_finance": {
+      "enabled": true,
+      "granularity": "daily",
+      "date_range": {
+        "start": "2025-01-01",
+        "end": "auto"
+      },
+      "url": "https://finance.yahoo.com/quote/GC=F",
+      "requires_api_key": false,
+      "notes": "Gold futures (GC=F) from Yahoo Finance. Fills gap from 2025-present. Free, no API key required."
+    },
+    "wikipedia": {
+      "enabled": false,
+      "granularity": "5-year",
+      "date_range": {
+        "start": "1970-01-01",
+        "end": "2010-01-01"
+      },
+      "url": "https://en.wikipedia.org/wiki/Gold_as_an_investment",
+      "requires_api_key": false,
+      "notes": "5-year interval data from 1970-2010. Disabled by default since MeasuringWorth has better coverage"
+    }
+  },
+  "merge_strategy": {
+    "prefer_higher_granularity": true,
+    "priority_order": ["latest", "backfill", "existing"],
+    "notes": "Latest (daily) data takes precedence, then backfill sources by granularity (monthly > annual > 5-year), then existing published data"
+  }
+}
