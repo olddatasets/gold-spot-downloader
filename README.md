@@ -67,33 +67,33 @@ date,price,currency
 
 ## Architecture
 
-The system uses a **three-script architecture**:
+The system uses a **single unified script** that handles everything:
 
-### 1. `backfill_gold_data.py`
-Fetches historical data from sources with good long-term coverage. Run infrequently (weekly/monthly).
+### `update_gold_data.py`
 
-```bash
-python backfill_gold_data.py
-```
-
-**Sources:**
-- MeasuringWorth (annual, 1258-2024)
-- World Bank (monthly, 1960-present)
-- Yahoo Finance (daily, 2025-present)
-
-### 2. `merge_gold_data.py`
-Combines all data sources with proper priority ordering.
+One script to rule them all - fetches, merges, and updates in a single run.
 
 ```bash
-python merge_gold_data.py
+python update_gold_data.py
 ```
 
-**Merge Strategy:**
-- Higher granularity data overrides lower granularity for overlapping dates
-- Priority: Daily > Monthly > Annual
-- Generates `data/latest.csv` and timestamped snapshots
+**What it does:**
+1. **Fetches** data from all enabled sources:
+   - MeasuringWorth (annual, 1258-2024)
+   - World Bank (monthly, 1960-present)
+   - Yahoo Finance (daily, 2025-present)
 
-### 3. GitHub Actions (automated)
+2. **Merges** with proper priority ordering:
+   - Higher granularity data overrides lower granularity
+   - Priority: Daily > Monthly > Annual
+
+3. **Generates** output:
+   - `data/latest.csv` (always current)
+   - `data/gold_spot_YYYYMMDD.csv` (timestamped)
+   - `data/source_stats.json` (statistics)
+   - `index.html` (updated with latest data)
+
+### GitHub Actions (automated)
 Runs daily at 6 AM UTC to fetch and publish updated data.
 
 ## Local Development
@@ -106,11 +106,8 @@ cd gold-spot-downloader
 # Install dependencies
 pip install -r requirements.txt
 
-# Fetch historical data
-python backfill_gold_data.py
-
-# Merge data sources
-python merge_gold_data.py
+# Fetch, merge, and update everything
+python update_gold_data.py
 
 # View locally
 python -m http.server 8000
