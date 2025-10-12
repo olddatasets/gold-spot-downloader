@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 from datetime import date, datetime
+from io import StringIO
 
 import pandas as pd
 import requests
@@ -169,6 +170,26 @@ def fetch_worldbank_data(start_date=None, end_date=None):
     return df
 
 
+def fetch_from_website(source_name, base_url="https://freegoldapi.com"):
+    """Try to fetch backfill data from the published website first."""
+    url = f"{base_url}/data/backfill/{source_name}_latest.csv"
+    print(f"Attempting to fetch {source_name} from website: {url}")
+
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+
+        df = pd.read_csv(StringIO(response.text))
+        df["date"] = pd.to_datetime(df["date"]).dt.date
+
+        print(f"Successfully fetched {len(df)} records from website")
+        print(f"Date range: {df['date'].min()} to {df['date'].max()}")
+        return df
+    except Exception as e:
+        print(f"Could not fetch from website: {e}")
+        return None
+
+
 def save_backfill_data(df, source_name, output_dir="data/backfill"):
     """Save backfill data to a source-specific file."""
     os.makedirs(output_dir, exist_ok=True)
@@ -304,14 +325,19 @@ def main():
 
         print(f"\n--- Fetching from {source_name} ---")
 
-        df = None
-        if source_name.startswith("measuringworth"):
-            series = source_config.get("series", "london")
-            df = fetch_measuringworth_data(series=series)
-        elif source_name == "yahoo_finance":
-            df = fetch_yahoo_finance_data()
-        elif source_name == "worldbank":
-            df = fetch_worldbank_data()
+        # Try to fetch from website first
+        df = fetch_from_website(source_name)
+
+        # If website fetch failed, fall back to normal backfill
+        if df is None:
+            print(f"Falling back to normal backfill for {source_name}...")
+            if source_name.startswith("measuringworth"):
+                series = source_config.get("series", "london")
+                df = fetch_measuringworth_data(series=series)
+            elif source_name == "yahoo_finance":
+                df = fetch_yahoo_finance_data()
+            elif source_name == "worldbank":
+                df = fetch_worldbank_data()
 
         if df is not None and not df.empty:
             save_backfill_data(df, source_name)

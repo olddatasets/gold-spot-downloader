@@ -78,9 +78,11 @@ python update_gold_data.py
 
 **What it does:**
 1. **Fetches** data from all enabled sources:
-   - MeasuringWorth (annual, 1258-2024)
-   - World Bank (monthly, 1960-present)
-   - Yahoo Finance (daily, 2025-present)
+   - First tries to download from website (https://freegoldapi.com/data/backfill/)
+   - Falls back to original sources if website data unavailable:
+     - MeasuringWorth (annual, 1258-2024)
+     - World Bank (monthly, 1960-present)
+     - Yahoo Finance (daily, 2025-present)
 
 2. **Merges** with proper priority ordering:
    - Higher granularity data overrides lower granularity
