@@ -308,8 +308,6 @@ def save_csv(df, source_stats=None, output_dir="data"):
     return filename
 
 
-
-
 def main():
     """Main execution function."""
     config = load_config()
@@ -325,12 +323,19 @@ def main():
 
         print(f"\n--- Fetching from {source_name} ---")
 
-        # Try to fetch from website first
-        df = fetch_from_website(source_name)
+        # Only use website fallback for historical sources that don't change
+        # Always fetch fresh data for Yahoo Finance and World Bank
+        use_website_fallback = source_name.startswith("measuringworth")
 
-        # If website fetch failed, fall back to normal backfill
+        df = None
+        if use_website_fallback:
+            # Try to fetch from website first for historical data
+            df = fetch_from_website(source_name)
+
+        # If website fetch failed or skipped, fetch from original source
         if df is None:
-            print(f"Falling back to normal backfill for {source_name}...")
+            if use_website_fallback:
+                print(f"Falling back to normal backfill for {source_name}...")
             if source_name.startswith("measuringworth"):
                 series = source_config.get("series", "london")
                 df = fetch_measuringworth_data(series=series)
