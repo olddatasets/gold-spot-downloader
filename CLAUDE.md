@@ -49,7 +49,7 @@ Combines all data sources into final dataset with proper priority ordering. Run 
 - `data/latest.csv` (always current)
 - `index.html` (with proper source attribution and link to `sources.html`)
 
-**Key behavior**: Merge script loads from published website first (`https://freeprice.gold/data/latest.csv`), ensuring fresh CI environments get complete history.
+**Key behavior**: Merge script loads from published website first (`https://freegoldapi.com/data/latest.csv`), ensuring fresh CI environments get complete history.
 
 ### Data Granularity & Coverage
 
@@ -157,4 +157,4 @@ The repository is intended to be published via GitHub Pages with:
 - **`data/backfill/`**: Individual source data files for debugging
 - **`data/latest/`**: Latest data from MetalpriceAPI
 
-Link structure assumes the site is published at `https://freeprice.gold/`.
+Link structure assumes the site is published at `https://freegoldapi.com/`.

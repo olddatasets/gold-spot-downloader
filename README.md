@@ -1,10 +1,10 @@
-# freeprice.gold
+# freegoldapi.com
 
 **Free, comprehensive historical gold price data spanning 768 years (1258-2025)**
 
 [![Update Gold Price Data](https://github.com/posix4e/gold-spot-downloader/actions/workflows/update-data.yml/badge.svg)](https://github.com/posix4e/gold-spot-downloader/actions/workflows/update-data.yml)
 
-📊 **Live site:** [freeprice.gold](https://freeprice.gold) (or [posix4e.github.io/gold-spot-downloader](https://posix4e.github.io/gold-spot-downloader))
+📊 **Live site:** [freegoldapi.com](https://freegoldapi.com)
 
 ## Dataset Overview
 
@@ -20,8 +20,7 @@
 ## Quick Start
 
 **Download the latest data:**
-- **CSV:** [data/latest.csv](https://freeprice.gold/data/latest.csv)
-- **Interactive timeline:** [sources.html](https://freeprice.gold/sources.html)
+- **CSV:** [data/latest.csv](https://freegoldapi.com/data/latest.csv)
 
 **CSV Format:**
 ```csv
