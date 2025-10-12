@@ -47,7 +47,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 30px;
-            height: 400px;
+            height: 500px;
         }
         .legend {
             display: grid;
@@ -236,7 +236,7 @@
                     backgroundColor: metadata.color || '#999',
                     borderColor: '#333',
                     borderWidth: 2,
-                    barThickness: 50
+                    barThickness: 40
                 };
             });
 
@@ -285,6 +285,7 @@
                             max: new Date(new Date().getFullYear() + 1, 0, 1)
                         },
                         y: {
+                            type: 'category',
                             title: {
                                 display: true,
                                 text: 'Data Source',
