@@ -39,15 +39,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run backfill script
+    - name: Update gold price data
       run: |
-        echo "Fetching historical gold price data..."
-        python backfill_gold_data.py
-
-    - name: Run merge script
-      run: |
-        echo "Merging all data sources..."
-        python merge_gold_data.py
+        echo "Fetching and merging gold price data..."
+        python update_gold_data.py
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
