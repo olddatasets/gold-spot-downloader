@@ -287,85 +287,6 @@ def save_csv(df, source_stats=None, output_dir="data"):
     return filename
 
 
-def update_index_html(latest_filename, source_stats):
-    """Update index.html with proper attribution."""
-    html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=data/latest.csv">
-    <title>freeprice.gold - Free Historical Gold Price Data (1258-2025)</title>
-    <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 40px; max-width: 900px; margin-left: auto; margin-right: auto; }}
-        .stat {{ background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; }}
-        h1 {{ color: #d4af37; }}
-        .hero {{ background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); padding: 30px; border-radius: 10px; margin-bottom: 30px; }}
-        .hero h1 {{ margin: 0 0 10px 0; color: #333; }}
-        .hero p {{ margin: 5px 0; color: #555; }}
-    </style>
-</head>
-<body>
-    <div class="hero">
-        <h1>📊 freeprice.gold</h1>
-        <p><strong>Free, comprehensive historical gold price data spanning 768 years (1258-2025)</strong></p>
-        <p>1,678 records from British Official Prices through modern futures markets</p>
-    </div>
-
-    <h2>Download Data</h2>
-    <p><strong>Latest dataset:</strong> <a href="data/latest.csv">data/latest.csv</a> (automatically updated)</p>
-    <p>Timestamped version: <a href="data/{latest_filename}">{latest_filename}</a></p>
-
-    <h2>Data Sources</h2>
-    <p><a href="sources.html"><strong>→ View interactive data source timeline</strong></a></p>
-
-    <div class="stat">
-        <h3>Coverage Summary</h3>
-        <ul>"""
-
-    if source_stats:
-        for source, stats in source_stats.items():
-            source_name = {
-                "measuringworth_british": "MeasuringWorth British Official Price",
-                "measuringworth_london": "MeasuringWorth London Market Price",
-                "worldbank": "World Bank Commodity Prices",
-                "yahoo_finance": "Yahoo Finance",
-            }.get(source, source)
-            html_content += f"""
-            <li><strong>{source_name}</strong>: {stats['count']:,} records ({stats['start']} to {stats['end']})
-                <a href="data/backfill/{source}_latest.csv">[download raw data]</a></li>"""
-
-    html_content += """
-        </ul>
-    </div>
-
-    <h3>Source Attribution</h3>
-    <ul>
-        <li><strong>British Official Price (1258-1717)</strong>: <a href="https://www.measuringworth.com/datasets/gold/">MeasuringWorth</a> (annual)
-            <br><small>Citation: Lawrence H. Officer and Samuel H. Williamson, 'The Price of Gold, 1257-1945,' MeasuringWorth, 2025</small>
-        </li>
-        <li><strong>London Market Price (1718-1959)</strong>: <a href="https://www.measuringworth.com/datasets/gold/">MeasuringWorth</a> (annual)
-            <br><small>Citation: Lawrence H. Officer and Samuel H. Williamson, 'The Price of Gold, 1718-2024,' MeasuringWorth, 2025</small>
-        </li>
-        <li><strong>World Bank Commodity Prices (1960-2024)</strong>: <a href="https://www.worldbank.org/en/research/commodity-markets">World Bank Pink Sheet</a> (monthly)
-            <br><small>Gold prices in USD per troy ounce</small>
-        </li>
-        <li><strong>Yahoo Finance (2025-present)</strong>: <a href="https://finance.yahoo.com/quote/GC=F">Gold Futures (GC=F)</a> (daily)
-            <br><small>Current gold futures prices in USD per troy ounce</small>
-        </li>
-    </ul>
-
-    <p>Source code available on <a href="https://github.com/posix4e/freeprice.gold">GitHub</a></p>
-
-    <footer>
-        <p><small>This data is compiled for non-profit educational purposes. MeasuringWorth data used with proper attribution as per their terms of use.</small></p>
-    </footer>
-</body>
-</html>"""
-
-    with open("index.html", "w") as f:
-        f.write(html_content)
-    print("Updated index.html with data source attribution")
 
 
 def main():
@@ -441,8 +362,6 @@ def main():
         with open(full_ranges_path, "w") as f:
             json.dump(full_source_ranges, f, indent=2)
         print(f"Full source ranges saved to {full_ranges_path}")
-
-    update_index_html(filename, source_stats)
 
     print("\n=== Complete ===")
 
