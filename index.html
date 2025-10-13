@@ -119,8 +119,51 @@
 
     <div class="section">
         <h2>📥 Download Data</h2>
-        <p><strong>Latest dataset:</strong> <a href="data/latest.csv">data/latest.csv</a> (automatically updated daily)</p>
-        <p><strong>Format:</strong> CSV with columns: date, price, currency</p>
+        <div id="lastUpdated" style="background: #f0f8ff; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;">
+            <strong>Last Updated:</strong> <span id="updateTime">Loading...</span><br>
+            <strong>Most Recent Data:</strong> <span id="latestDate">Loading...</span> |
+            <strong>Gold Price:</strong> <span id="latestPrice">Loading...</span> |
+            <strong>Gold/Silver Ratio:</strong> <span id="latestRatio">Loading...</span>
+        </div>
+
+        <p><strong>Primary dataset (USD-normalized):</strong> <a href="data/latest.csv">data/latest.csv</a></p>
+        <p style="margin-left: 20px; font-size: 14px; color: #666;">
+            CSV with columns: <code>date, price, source</code><br>
+            All prices normalized to USD where possible using historical USD/GBP exchange rates (1791-present).<br>
+            Pre-1791 British prices remain in GBP due to lack of reliable exchange rate data.<br>
+            The <code>source</code> column shows both the data source and normalization status:
+            <ul style="margin: 5px 0 0 20px; padding-left: 20px;">
+                <li><code>measuringworth_british (GBP)</code> - Original GBP price (pre-1791, no conversion available)</li>
+                <li><code>measuringworth_london (GBP->USD)</code> - Converted from GBP to USD using historical exchange rates</li>
+                <li><code>worldbank</code> - Already in USD (no conversion needed)</li>
+                <li><code>yahoo_finance</code> - Already in USD (no conversion needed)</li>
+            </ul>
+        </p>
+
+        <p><strong>Silver-enriched dataset:</strong> <a href="data/gold_silver_ratio_enriched.csv">data/gold_silver_ratio_enriched.csv</a></p>
+        <p style="margin-left: 20px; font-size: 14px; color: #666;">
+            CSV with columns: <code>date, price, silver_oz_per_gold_oz</code><br>
+            Includes gold/silver ratio showing ounces of silver per ounce of gold (1687-present, daily for 2025+)
+        </p>
+
+        <p><strong>Silver-normalized dataset (metallic standard):</strong> <a href="data/gold_silver_normalized.csv">data/gold_silver_normalized.csv</a></p>
+        <p style="margin-left: 20px; font-size: 14px; color: #666;">
+            CSV with columns: <code>date, price, source</code><br>
+            Alternative view where gold's "price" is expressed in <strong>ounces of silver</strong>, not currency.<br>
+            This transcends fiat currency fluctuations and reflects historical metallic standards (like U.S. silver redemption).<br>
+            The price column represents how many ounces of silver equal one ounce of gold.<br>
+            <br>
+            <strong>Coverage:</strong> 1,248 records from 1688-present (74% of all gold price data)<br>
+            <ul style="margin: 5px 0 0 20px; padding-left: 20px;">
+                <li>1688-1717: Annual ratios applied to annual gold prices (30 records)</li>
+                <li>1718-1959: Annual ratios applied to annual gold prices (242 records)</li>
+                <li>1960-2024: Annual ratios applied to monthly gold prices (780 records)</li>
+                <li>2025-present: Daily ratios applied to daily gold prices (196 records)</li>
+            </ul>
+            <em>Note: Pre-1688 gold prices (1258-1687, 430 records) cannot be silver-normalized due to lack of historical gold/silver ratio data.</em>
+        </p>
+
+        <p style="margin-top: 15px;"><em>All datasets automatically updated daily</em></p>
     </div>
 
     <div class="section">
@@ -145,6 +188,8 @@
 
     <div class="section">
         <h2>🔄 Merge Strategy</h2>
+
+        <h3>Gold Price Data:</h3>
         <p><strong>Priority Order:</strong> When dates overlap, we use the following priority (highest first):</p>
         <ol>
             <li><strong>Yahoo Finance</strong> - Daily data, 2025-present (highest priority, most granular current data)</li>
@@ -153,6 +198,26 @@
             <li><strong>MeasuringWorth British</strong> - Annual data, 1257-1717 (fills oldest historical gaps)</li>
         </ol>
         <p>This provides comprehensive historical gold price data spanning nearly 800 years (1257-2025) with increasing granularity over time.</p>
+
+        <h3>Silver Data & Gold/Silver Ratios:</h3>
+        <p>Silver data is NOT merged into the gold price dataset. Instead, it's used to calculate current gold/silver ratios:</p>
+        <ul>
+            <li><strong>Historical ratios (1688-2024)</strong>: From MeasuringWorth (annual, Jan 1 each year)</li>
+            <li><strong>Current ratios (2025-present)</strong>: Calculated by dividing Yahoo Finance gold prices (GC=F) by silver prices (SI=F) daily</li>
+            <li>Both historical and calculated ratios are merged into the <code>gold_silver_ratio_enriched.csv</code> dataset</li>
+            <li>When dates overlap, calculated ratios from Yahoo Finance take priority over historical annual ratios</li>
+        </ul>
+        <p>This approach ensures both gold and silver data remain fresh, with the ratio automatically updating as markets move.</p>
+
+        <h3>Silver-Normalized Dataset Strategy:</h3>
+        <p>The <code>gold_silver_normalized.csv</code> dataset applies gold/silver ratios to gold prices to create a metallic standard view:</p>
+        <ul>
+            <li><strong>Ratio application</strong>: Annual ratios (from MeasuringWorth) are applied to ALL dates within the same year</li>
+            <li><strong>Daily ratios (2025+)</strong>: Daily Yahoo Finance ratios are matched to their specific dates</li>
+            <li><strong>Coverage limitation</strong>: Only dates with ratio data (1688+) can be silver-normalized</li>
+            <li>This provides 1,248 records (74% coverage) vs. 1,678 total gold price records</li>
+        </ul>
+        <p><em>Example: The 2020 annual ratio (72.04) is applied to all 12 monthly World Bank gold prices in 2020, providing a consistent metallic standard for that year.</em></p>
     </div>
 
     <div class="section">
@@ -161,14 +226,25 @@
             <li><strong>British Official Price (1258-1717)</strong>: <a href="https://www.measuringworth.com/datasets/gold/">MeasuringWorth</a> (annual)
                 <br><small>Citation: Lawrence H. Officer and Samuel H. Williamson, 'The Price of Gold, 1257-1945,' MeasuringWorth, 2025</small>
             </li>
+            <li><strong>Gold/Silver Ratio (1687-present)</strong>: <a href="https://www.measuringworth.com/datasets/gold/">MeasuringWorth</a> (annual)
+                <br><small>Citation: Lawrence H. Officer and Samuel H. Williamson, 'The Price of Gold, 1257-2024,' MeasuringWorth, 2025</small>
+                <br><small>Ratio shows ounces of silver per ounce of gold</small>
+            </li>
             <li><strong>London Market Price (1718-1959)</strong>: <a href="https://www.measuringworth.com/datasets/gold/">MeasuringWorth</a> (annual)
                 <br><small>Citation: Lawrence H. Officer and Samuel H. Williamson, 'The Price of Gold, 1718-2024,' MeasuringWorth, 2025</small>
+            </li>
+            <li><strong>Dollar-Pound Exchange Rate (1791-present)</strong>: <a href="https://www.measuringworth.com/datasets/exchangepound/">MeasuringWorth</a> (annual)
+                <br><small>Citation: Lawrence H. Officer, 'Dollar-Pound Exchange Rate From 1791,' MeasuringWorth, 2025</small>
+                <br><small>Exchange rate shows USD per British pound</small>
             </li>
             <li><strong>World Bank Commodity Prices (1960-2024)</strong>: <a href="https://www.worldbank.org/en/research/commodity-markets">World Bank Pink Sheet</a> (monthly)
                 <br><small>Gold prices in USD per troy ounce</small>
             </li>
-            <li><strong>Yahoo Finance (2025-present)</strong>: <a href="https://finance.yahoo.com/quote/GC=F">Gold Futures (GC=F)</a> (daily)
+            <li><strong>Yahoo Finance Gold (2025-present)</strong>: <a href="https://finance.yahoo.com/quote/GC=F">Gold Futures (GC=F)</a> (daily)
                 <br><small>Current gold futures prices in USD per troy ounce</small>
+            </li>
+            <li><strong>Yahoo Finance Silver (2025-present)</strong>: <a href="https://finance.yahoo.com/quote/SI=F">Silver Futures (SI=F)</a> (daily)
+                <br><small>Silver futures prices used to calculate current gold/silver ratios</small>
             </li>
         </ul>
     </div>
@@ -189,12 +265,33 @@
                 url: 'https://www.measuringworth.com/datasets/gold/',
                 description: 'Oldest gold price data available'
             },
+            'gold_silver_ratio': {
+                name: 'MeasuringWorth - Gold/Silver Ratio',
+                granularity: 'Annual',
+                color: '#C0C0C0',
+                url: 'https://www.measuringworth.com/datasets/gold/',
+                description: 'Gold/silver price ratio (1687-2024, annual)'
+            },
+            'yahoo_silver': {
+                name: 'Yahoo Finance - Silver Futures',
+                granularity: 'Daily',
+                color: '#B8B8B8',
+                url: 'https://finance.yahoo.com/quote/SI=F',
+                description: 'Silver futures for calculating current ratios (2025-present)'
+            },
             'measuringworth_london': {
                 name: 'MeasuringWorth - London Market Price',
                 granularity: 'Annual',
                 color: '#DAA520',
                 url: 'https://www.measuringworth.com/datasets/gold/',
                 description: 'London market price from 1718'
+            },
+            'dollar_pound_exchange': {
+                name: 'MeasuringWorth - USD/GBP Exchange Rate',
+                granularity: 'Annual',
+                color: '#4169E1',
+                url: 'https://www.measuringworth.com/datasets/exchangepound/',
+                description: 'Dollar-pound exchange rate (1791-present)'
             },
             'worldbank': {
                 name: 'World Bank Commodity Prices',
@@ -215,14 +312,17 @@
         // Load and display data
         Promise.all([
             fetch('data/source_ranges_full.json').then(r => r.json()),
-            fetch('data/source_stats.json').then(r => r.json())
+            fetch('data/source_stats.json').then(r => r.json()),
+            fetch('data/generation_metadata.json').then(r => r.json())
         ])
-            .then(([fullRanges, usedStats]) => {
+            .then(([fullRanges, usedStats, metadata]) => {
                 console.log('Loaded full ranges:', fullRanges);
                 console.log('Loaded used stats:', usedStats);
+                console.log('Loaded metadata:', metadata);
                 createTimeline(fullRanges);
                 createLegend(fullRanges, usedStats);
                 createCoverageSummary(usedStats);
+                updateMetadata(metadata);
             })
             .catch(error => {
                 console.error('Error loading source data:', error);
@@ -232,6 +332,51 @@
                     : '<p style="color: #999; text-align: center;">Source statistics will appear here after running the update script.</p>';
                 document.getElementById('legendContainer').innerHTML = errorMsg;
             });
+
+        function updateMetadata(metadata) {
+            if (!metadata) return;
+
+            // Format the update time
+            const updateDate = new Date(metadata.generated_at);
+            document.getElementById('updateTime').textContent = updateDate.toLocaleString();
+
+            // Show most recent data
+            if (metadata.date_range) {
+                const latestDataDate = new Date(metadata.date_range.latest + 'T00:00:00');
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                latestDataDate.setHours(0, 0, 0, 0);
+
+                const daysDiff = Math.floor((today - latestDataDate) / (1000 * 60 * 60 * 24));
+                const latestDay = latestDataDate.getDay();
+                const isWeekend = (latestDay === 6 || latestDay === 0); // Saturday or Sunday
+                const todayIsWeekend = (today.getDay() === 6 || today.getDay() === 0);
+
+                let dateText = metadata.date_range.latest || 'N/A';
+
+                // If data is from Friday and today is weekend, show weekend icon
+                if (daysDiff >= 1 && daysDiff <= 2 && latestDay === 5 && todayIsWeekend) {
+                    dateText += ' 🌴 (markets closed for weekend)';
+                } else if (daysDiff >= 1) {
+                    dateText += ` (${daysDiff} day${daysDiff > 1 ? 's' : ''} ago)`;
+                }
+
+                document.getElementById('latestDate').textContent = dateText;
+            }
+
+            // Show latest gold price
+            if (metadata.most_recent_data && metadata.most_recent_data.yahoo_finance_gold) {
+                const price = metadata.most_recent_data.yahoo_finance_gold.latest_price;
+                document.getElementById('latestPrice').textContent = price ? `$${price.toFixed(2)} USD` : 'N/A';
+            }
+
+            // Show latest gold/silver ratio
+            if (metadata.most_recent_data && metadata.most_recent_data.gold_silver_ratio) {
+                const ratio = metadata.most_recent_data.gold_silver_ratio.latest_ratio;
+                const source = metadata.most_recent_data.gold_silver_ratio.source;
+                document.getElementById('latestRatio').textContent = ratio ? `${ratio.toFixed(2)} (${source})` : 'N/A';
+            }
+        }
 
         function createTimeline(stats) {
             const ctx = document.getElementById('timelineChart').getContext('2d');
