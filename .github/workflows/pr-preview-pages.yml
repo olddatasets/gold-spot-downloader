@@ -1,0 +1,148 @@
+name: PR Preview with GitHub Pages
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy-preview:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository # Only run for PRs from the same repo
+
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Update gold price data
+      run: |
+        echo "Fetching and merging gold price data for preview..."
+        python update_gold_data.py
+
+    - name: Prepare preview directory
+      run: |
+        # Create preview directory structure
+        mkdir -p preview/pr-${{ github.event.pull_request.number }}
+
+        # Copy all files to PR-specific subdirectory
+        cp -r data preview/pr-${{ github.event.pull_request.number }}/
+        cp index.html preview/pr-${{ github.event.pull_request.number }}/
+
+        # Create an index.html at root that redirects to the PR preview
+        cat > preview/index.html <<EOF
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>PR Preview #${{ github.event.pull_request.number }}</title>
+            <meta http-equiv="refresh" content="0; url=./pr-${{ github.event.pull_request.number }}/">
+        </head>
+        <body>
+            <p>Redirecting to PR preview #${{ github.event.pull_request.number }}...</p>
+        </body>
+        </html>
+        EOF
+
+        echo "Preview structure:"
+        ls -la preview/
+
+    - name: Deploy to GitHub Pages (preview branch)
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./preview
+        destination_dir: preview/pr-${{ github.event.pull_request.number }}
+        publish_branch: gh-pages-preview
+        keep_files: true # Keep other PR previews
+
+    - name: Comment PR with preview link
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const previewUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/preview/pr-${{ github.event.pull_request.number }}/`;
+
+          const comment = `## 🚀 Live Preview Ready!
+
+          ### 🌐 [View Live Preview](${previewUrl})
+
+          The preview includes:
+          - Latest gold price data (fetched fresh for this PR)
+          - All generated CSV files and datasets
+          - Full interactive website with your changes
+
+          **Preview URL:** ${previewUrl}
+
+          ⚠️ **Note:**
+          - This preview will remain available until the PR is closed
+          - The preview updates automatically when you push new commits
+          - Only works for PRs from the same repository (not forks)`;
+
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const botComment = comments.find(comment =>
+            comment.user.type === 'Bot' &&
+            comment.body.includes('Live Preview Ready')
+          );
+
+          if (botComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: comment
+            });
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+          }
+
+  cleanup-preview:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+
+    steps:
+    - name: Checkout gh-pages-preview branch
+      uses: actions/checkout@v4
+      with:
+        ref: gh-pages-preview
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Remove PR preview
+      run: |
+        # Remove the PR preview directory
+        rm -rf preview/pr-${{ github.event.pull_request.number }}
+
+        # Commit the removal
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "Remove preview for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+        git push

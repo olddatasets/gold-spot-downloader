@@ -44,13 +44,31 @@ jobs:
         echo "Fetching and merging gold price data..."
         python update_gold_data.py
 
+    - name: Prepare deployment directory
+      run: |
+        # Create a clean deployment directory
+        mkdir -p deploy
+
+        # Copy only the necessary files for the website
+        cp -r data deploy/
+        cp index.html deploy/
+        cp -r css deploy/ 2>/dev/null || true
+        cp -r js deploy/ 2>/dev/null || true
+        cp -r images deploy/ 2>/dev/null || true
+        cp favicon.ico deploy/ 2>/dev/null || true
+        cp CNAME deploy/ 2>/dev/null || true
+
+        # List what we're deploying
+        echo "Files to deploy:"
+        ls -la deploy/
+
     - name: Setup Pages
       uses: actions/configure-pages@v5
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: '.'
+        path: './deploy'
 
     - name: Deploy to GitHub Pages
       id: deployment

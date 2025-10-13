@@ -1,0 +1,136 @@
+name: PR Preview
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Update gold price data
+      run: |
+        echo "Fetching and merging gold price data for preview..."
+        python update_gold_data.py
+
+    - name: Prepare deployment directory
+      run: |
+        # Create a clean deployment directory
+        mkdir -p deploy
+
+        # Copy only the necessary files for the website
+        cp -r data deploy/
+        cp index.html deploy/
+        cp -r css deploy/ 2>/dev/null || true
+        cp -r js deploy/ 2>/dev/null || true
+        cp -r images deploy/ 2>/dev/null || true
+        cp favicon.ico deploy/ 2>/dev/null || true
+
+        # Don't copy CNAME for PR previews
+
+        # List what we're deploying
+        echo "Files to deploy:"
+        ls -la deploy/
+
+    - name: Deploy to Surge.sh
+      run: |
+        # Install surge
+        npm install -g surge
+
+        # Deploy to surge with PR-specific domain
+        export SURGE_DOMAIN="gold-api-pr-${{ github.event.pull_request.number }}.surge.sh"
+
+        # Deploy without login (using token)
+        surge ./deploy https://$SURGE_DOMAIN --token ${{ secrets.SURGE_TOKEN }}
+
+        echo "PREVIEW_URL=https://$SURGE_DOMAIN" >> $GITHUB_ENV
+      continue-on-error: true
+
+    - name: Upload preview artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr-preview-${{ github.event.pull_request.number }}
+        path: deploy/
+        retention-days: 7
+
+    - name: Comment PR with preview link
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const surgeUrl = process.env.PREVIEW_URL || null;
+          const artifactURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+          let comment = `## 🚀 Preview Ready!\n\n`;
+
+          if (surgeUrl) {
+            comment += `### 🌐 Live Preview\n`;
+            comment += `**[View Live Preview](${surgeUrl})** ← Click here to see the site\n\n`;
+            comment += `The preview includes:\n`;
+            comment += `- Latest gold price data (fetched fresh)\n`;
+            comment += `- All generated CSV files\n`;
+            comment += `- Full interactive website\n\n`;
+          }
+
+          comment += `### 📦 Download Preview\n`;
+          comment += `[Download preview artifact](${artifactURL}) (pr-preview-${{ github.event.pull_request.number }})\n\n`;
+
+          if (!surgeUrl) {
+            comment += `To view locally:\n`;
+            comment += `1. Download and extract the artifact\n`;
+            comment += `2. Run \`python -m http.server 8000\` in the extracted directory\n`;
+            comment += `3. Visit http://localhost:8000\n\n`;
+            comment += `*Note: Set SURGE_TOKEN secret in repository settings for live preview links.*\n`;
+          }
+
+          comment += `\n⚠️ **Note:** This preview will be deleted when the PR is closed or merged.`;
+
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const botComment = comments.find(comment =>
+            comment.user.type === 'Bot' &&
+            comment.body.includes('Preview Ready')
+          );
+
+          if (botComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: comment
+            });
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+          }

@@ -3,354 +3,724 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>freegoldapi.com - Free Historical Gold Price Data (1258-2025)</title>
+    <title>Free Gold API - 768 Years of Historical Gold Price Data (1258-2025)</title>
 
-    <!-- Open Graph / Facebook -->
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free comprehensive historical gold price data API spanning 768 years (1258-2025). Daily, monthly, and annual gold prices in USD with silver ratios. No API key required.">
+    <meta name="keywords" content="gold price api, free gold api, historical gold prices, gold data, gold silver ratio, commodity prices, gold futures, precious metals data">
+    <meta name="author" content="FreeGoldAPI.com">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Free Gold API - 768 Years of Historical Gold Price Data">
+    <meta property="og:description" content="Free comprehensive historical gold price data spanning 768 years. Daily, monthly, and annual prices with silver ratios.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://freegoldapi.com/">
-    <meta property="og:title" content="freegoldapi.com - Free Historical Gold Price Data (1258-2025)">
-    <meta property="og:description" content="Free, comprehensive historical gold price data spanning 768 years. 1,678 records from British Official Prices through modern futures markets.">
     <meta property="og:image" content="https://freegoldapi.com/preview.png">
 
-    <!-- Twitter -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://freegoldapi.com/">
-    <meta name="twitter:title" content="freegoldapi.com - Free Historical Gold Price Data (1258-2025)">
-    <meta name="twitter:description" content="Free, comprehensive historical gold price data spanning 768 years. 1,678 records from British Official Prices through modern futures markets.">
-    <meta name="twitter:image" content="https://freegoldapi.com/preview.png">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <meta name="twitter:title" content="Free Gold API - Historical Gold Prices Since 1258">
+    <meta name="twitter:description" content="Free API with 768 years of gold price data. No key required.">
+
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        * {
             margin: 0;
-            padding: 20px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            background-color: #f5f5f5;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .hero {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .hero h1 {
-            margin: 0 0 10px 0;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
             color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-        .hero p {
-            margin: 5px 0;
-            color: #555;
-        }
-        .section {
-            background: white;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 1.2em;
             margin-bottom: 20px;
         }
-        .section h2 {
-            margin-top: 0;
-            color: #333;
-        }
-        .chart-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            height: 500px;
-        }
-        .legend {
+
+        .stats-bar {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #555;
+            margin: 20px 0 10px;
+            font-size: 1.3em;
+        }
+
+        .downloads {
+            display: grid;
             gap: 15px;
             margin-top: 20px;
         }
-        .legend-item {
-            background: white;
+
+        .download-item {
             padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
         }
-        .legend-item h3 {
-            margin: 0 0 10px 0;
-            font-size: 16px;
+
+        .download-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
         }
-        .legend-item p {
-            margin: 5px 0;
-            font-size: 14px;
+
+        .download-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .download-link:hover {
+            text-decoration: underline;
+        }
+
+        .download-desc {
             color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
         }
-        .legend-item .granularity {
+
+        .data-source {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+        }
+
+        .source-gold {
+            border-left-color: #FFD700;
+        }
+
+        .source-silver {
+            border-left-color: #C0C0C0;
+        }
+
+        .source-exchange {
+            border-left-color: #4169E1;
+        }
+
+        .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .source-title {
             font-weight: bold;
             color: #333;
         }
-        .stat {
-            background: #f5f5f5;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+
+        .source-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .badge-enabled {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-disabled {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-granularity {
+            background: #007bff;
+            color: white;
+        }
+
+        .badge-records {
+            background: #6c757d;
+            color: white;
+        }
+
+        .timeline-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .code-comment {
+            color: #6A9955;
+        }
+
         footer {
             text-align: center;
             margin-top: 40px;
-            color: #666;
-            font-size: 14px;
+            padding: 20px;
+            color: white;
         }
-        a {
-            color: #0066cc;
-            text-decoration: none;
+
+        footer a {
+            color: white;
+            font-weight: bold;
         }
-        a:hover {
-            text-decoration: underline;
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .alert-info {
+            background: #cce5ff;
+            border-left: 4px solid #004085;
+            color: #004085;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid #155724;
+            color: #155724;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 2fr 1fr;
+            }
         }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="hero">
-        <h1>📊 freegoldapi.com</h1>
-        <p><strong>Free, comprehensive historical gold price data spanning 768 years (1258-2025)</strong></p>
-        <p>1,678 records from British Official Prices through modern futures markets</p>
-    </div>
+    <div class="container">
+        <header>
+            <h1>🏆 FreeGoldAPI.com</h1>
+            <p class="tagline">The most comprehensive free historical gold price API on the internet</p>
 
-    <div class="section">
-        <h2>📥 Download Data</h2>
-        <p><strong>Latest dataset:</strong> <a href="data/latest.csv">data/latest.csv</a> (automatically updated daily)</p>
-        <p><strong>Format:</strong> CSV with columns: date, price, currency</p>
-    </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value">768</div>
+                    <div class="stat-label">Years of Data</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">1,678</div>
+                    <div class="stat-label">Gold Price Records</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Data Sources</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="latestPrice">Loading...</div>
+                    <div class="stat-label">Current Gold Price</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="latestRatio">Loading...</div>
+                    <div class="stat-label">Gold/Silver Ratio</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="updateTime">Loading...</div>
+                    <div class="stat-label">Last Updated</div>
+                </div>
+            </div>
+        </header>
 
-    <div class="section">
-        <h2>📊 Interactive Data Source Timeline</h2>
-        <p>Visual representation of our data sources and their coverage periods</p>
-    </div>
+        <div class="main-content">
+            <div class="left-column">
+                <div class="card">
+                    <h2>📥 Download Datasets</h2>
 
-    <div class="chart-container">
-        <canvas id="timelineChart"></canvas>
-    </div>
+                    <div class="downloads">
+                        <div class="download-item">
+                            <div class="download-title">Primary Dataset (USD Normalized)</div>
+                            <a href="data/latest.csv" class="download-link">data/latest.csv</a>
+                            <div class="download-desc">
+                                <strong>Format:</strong> date, price, source<br>
+                                <strong>Coverage:</strong> 1258-2025 (768 years)<br>
+                                All prices normalized to USD where exchange rates available (1791+).<br>
+                                Pre-1791 British prices remain in GBP.
+                            </div>
+                        </div>
 
-    <div class="legend" id="legendContainer">
-        <!-- Will be populated dynamically -->
-    </div>
+                        <div class="download-item">
+                            <div class="download-title">Gold/Silver Ratio Enriched</div>
+                            <a href="data/gold_silver_ratio_enriched.csv" class="download-link">data/gold_silver_ratio_enriched.csv</a>
+                            <div class="download-desc">
+                                <strong>Format:</strong> date, price, silver_oz_per_gold_oz<br>
+                                <strong>Coverage:</strong> 1687-2025<br>
+                                Includes historical and calculated gold/silver ratios
+                            </div>
+                        </div>
 
-    <div class="section">
-        <h2>📈 Coverage Summary</h2>
-        <ul id="coverageSummary">
-            <!-- Will be populated dynamically -->
-        </ul>
-    </div>
+                        <div class="download-item">
+                            <div class="download-title">Silver-Normalized (Metallic Standard)</div>
+                            <a href="data/gold_silver_normalized.csv" class="download-link">data/gold_silver_normalized.csv</a>
+                            <div class="download-desc">
+                                <strong>Format:</strong> date, price, source<br>
+                                <strong>Coverage:</strong> 1688-2025 (1,248 records)<br>
+                                Gold value expressed in ounces of silver (transcends fiat currency)
+                            </div>
+                        </div>
+                    </div>
 
-    <div class="section">
-        <h2>🔄 Merge Strategy</h2>
-        <p><strong>Priority Order:</strong> When dates overlap, we use the following priority (highest first):</p>
-        <ol>
-            <li><strong>Yahoo Finance</strong> - Daily data, 2025-present (highest priority, most granular current data)</li>
-            <li><strong>World Bank</strong> - Monthly data, 1960-2024</li>
-            <li><strong>MeasuringWorth London</strong> - Annual data, 1718-1959</li>
-            <li><strong>MeasuringWorth British</strong> - Annual data, 1257-1717 (fills oldest historical gaps)</li>
-        </ol>
-        <p>This provides comprehensive historical gold price data spanning nearly 800 years (1257-2025) with increasing granularity over time.</p>
-    </div>
+                    <div class="alert alert-info" style="margin-top: 20px;">
+                        <strong>🔄 Auto-Updated Daily:</strong> Data refreshes automatically at 6 AM UTC via GitHub Actions
+                    </div>
+                </div>
 
-    <div class="section">
-        <h2>📚 Source Attribution</h2>
-        <ul>
-            <li><strong>British Official Price (1258-1717)</strong>: <a href="https://www.measuringworth.com/datasets/gold/">MeasuringWorth</a> (annual)
-                <br><small>Citation: Lawrence H. Officer and Samuel H. Williamson, 'The Price of Gold, 1257-1945,' MeasuringWorth, 2025</small>
-            </li>
-            <li><strong>London Market Price (1718-1959)</strong>: <a href="https://www.measuringworth.com/datasets/gold/">MeasuringWorth</a> (annual)
-                <br><small>Citation: Lawrence H. Officer and Samuel H. Williamson, 'The Price of Gold, 1718-2024,' MeasuringWorth, 2025</small>
-            </li>
-            <li><strong>World Bank Commodity Prices (1960-2024)</strong>: <a href="https://www.worldbank.org/en/research/commodity-markets">World Bank Pink Sheet</a> (monthly)
-                <br><small>Gold prices in USD per troy ounce</small>
-            </li>
-            <li><strong>Yahoo Finance (2025-present)</strong>: <a href="https://finance.yahoo.com/quote/GC=F">Gold Futures (GC=F)</a> (daily)
-                <br><small>Current gold futures prices in USD per troy ounce</small>
-            </li>
-        </ul>
-    </div>
+                <div class="card">
+                    <h2>📊 Data Sources Timeline</h2>
+                    <div class="timeline-container">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                    <div id="sourceDetails"></div>
+                </div>
 
-    <footer>
-        <p><a href="https://github.com/posix4e/gold-spot-downloader">GitHub Repository</a></p>
-        <p>Data compiled for non-profit educational purposes</p>
-        <p><small>MeasuringWorth data used with proper attribution as per their terms of use.</small></p>
-    </footer>
+                <div class="card">
+                    <h2>🔧 Quick Start Examples</h2>
+
+                    <h3>Python</h3>
+                    <div class="code-block">
+import pandas as pd<br>
+<br>
+<span class="code-comment"># Load gold prices (USD normalized)</span><br>
+df = pd.read_csv('https://freegoldapi.com/data/latest.csv')<br>
+<br>
+<span class="code-comment"># Get current gold price</span><br>
+latest_price = df.iloc[-1]['price']<br>
+print(f"Current gold price: ${latest_price:.2f}")<br>
+<br>
+<span class="code-comment"># Load with silver ratios</span><br>
+df_ratio = pd.read_csv('https://freegoldapi.com/data/gold_silver_ratio_enriched.csv')<br>
+                    </div>
+
+                    <h3>JavaScript</h3>
+                    <div class="code-block">
+<span class="code-comment">// Fetch gold prices</span><br>
+fetch('https://freegoldapi.com/data/latest.csv')<br>
+  .then(response => response.text())<br>
+  .then(csv => {<br>
+    const lines = csv.split('\n');<br>
+    const lastLine = lines[lines.length - 2];<br>
+    const [date, price] = lastLine.split(',');<br>
+    console.log(`Gold price on ${date}: $${price}`);<br>
+  });
+                    </div>
+
+                    <h3>curl</h3>
+                    <div class="code-block">
+<span class="code-comment"># Get latest gold price</span><br>
+curl -s https://freegoldapi.com/data/latest.csv | tail -1<br>
+<br>
+<span class="code-comment"># Get gold prices for specific year</span><br>
+curl -s https://freegoldapi.com/data/latest.csv | grep "^2020"
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="card">
+                    <h2>📚 All Data Sources</h2>
+
+                    <h3>Gold Price Sources</h3>
+
+                    <div class="data-source source-gold">
+                        <div class="source-header">
+                            <div class="source-title">MeasuringWorth - British Official</div>
+                            <div class="source-meta">
+                                <span class="badge badge-enabled">ACTIVE</span>
+                                <span class="badge badge-granularity">ANNUAL</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 1258-1717<br>
+                            <strong>Records:</strong> ~460<br>
+                            <strong>Currency:</strong> GBP<br>
+                            Oldest available gold price data
+                        </div>
+                    </div>
+
+                    <div class="data-source source-gold">
+                        <div class="source-header">
+                            <div class="source-title">MeasuringWorth - London Market</div>
+                            <div class="source-meta">
+                                <span class="badge badge-enabled">ACTIVE</span>
+                                <span class="badge badge-granularity">ANNUAL</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 1718-1959<br>
+                            <strong>Records:</strong> ~242<br>
+                            <strong>Currency:</strong> GBP (converted to USD)<br>
+                            London gold market prices
+                        </div>
+                    </div>
+
+                    <div class="data-source source-gold">
+                        <div class="source-header">
+                            <div class="source-title">World Bank Pink Sheet</div>
+                            <div class="source-meta">
+                                <span class="badge badge-enabled">ACTIVE</span>
+                                <span class="badge badge-granularity">MONTHLY</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 1960-2024<br>
+                            <strong>Records:</strong> ~780<br>
+                            <strong>Currency:</strong> USD<br>
+                            Commodity market prices (PGOLD)
+                        </div>
+                    </div>
+
+                    <div class="data-source source-gold">
+                        <div class="source-header">
+                            <div class="source-title">Yahoo Finance - Gold Futures</div>
+                            <div class="source-meta">
+                                <span class="badge badge-enabled">ACTIVE</span>
+                                <span class="badge badge-granularity">DAILY</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 2025-present<br>
+                            <strong>Records:</strong> ~196 (grows daily)<br>
+                            <strong>Currency:</strong> USD<br>
+                            <strong>Ticker:</strong> GC=F<br>
+                            Real-time gold futures
+                        </div>
+                    </div>
+
+                    <h3>Silver & Ratio Sources</h3>
+
+                    <div class="data-source source-silver">
+                        <div class="source-header">
+                            <div class="source-title">Yahoo Finance - Silver Futures</div>
+                            <div class="source-meta">
+                                <span class="badge badge-enabled">ACTIVE</span>
+                                <span class="badge badge-granularity">DAILY</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 2025-present<br>
+                            <strong>Ticker:</strong> SI=F<br>
+                            <strong>Purpose:</strong> Calculate current gold/silver ratios<br>
+                            Not merged into gold dataset
+                        </div>
+                    </div>
+
+                    <div class="data-source source-silver">
+                        <div class="source-header">
+                            <div class="source-title">MeasuringWorth - Gold/Silver Ratio</div>
+                            <div class="source-meta">
+                                <span class="badge badge-enabled">ACTIVE</span>
+                                <span class="badge badge-granularity">ANNUAL</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 1687-2024<br>
+                            <strong>Records:</strong> ~338<br>
+                            Historical ratio data (oz silver per oz gold)
+                        </div>
+                    </div>
+
+                    <h3>Exchange Rate Sources</h3>
+
+                    <div class="data-source source-exchange">
+                        <div class="source-header">
+                            <div class="source-title">MeasuringWorth - USD/GBP</div>
+                            <div class="source-meta">
+                                <span class="badge badge-enabled">ACTIVE</span>
+                                <span class="badge badge-granularity">ANNUAL</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 1791-present<br>
+                            <strong>Records:</strong> ~234<br>
+                            Used to normalize GBP prices to USD
+                        </div>
+                    </div>
+
+                    <h3>Disabled Sources</h3>
+
+                    <div class="data-source">
+                        <div class="source-header">
+                            <div class="source-title">FRED (Federal Reserve)</div>
+                            <div class="source-meta">
+                                <span class="badge badge-disabled">DISABLED</span>
+                                <span class="badge badge-granularity">DAILY</span>
+                            </div>
+                        </div>
+                        <div class="download-desc">
+                            <strong>Period:</strong> 1968-present<br>
+                            Requires API key (disabled by default)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🔄 Merge Strategy</h2>
+                    <p>When dates overlap, priority order is:</p>
+                    <ol>
+                        <li><strong>Yahoo Finance</strong> (daily, most recent)</li>
+                        <li><strong>World Bank</strong> (monthly)</li>
+                        <li><strong>MeasuringWorth London</strong> (annual)</li>
+                        <li><strong>MeasuringWorth British</strong> (annual, oldest)</li>
+                    </ol>
+                    <p style="margin-top: 10px;">Higher granularity always wins. Daily data overrides monthly, which overrides annual.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><a href="https://github.com/posix4e/gold-spot-downloader">GitHub Repository</a> | Data compiled for educational purposes</p>
+            <p>All data sources properly attributed | MeasuringWorth data used per terms of use</p>
+        </footer>
+    </div>
 
     <script>
-        // Source metadata
-        const sourceMetadata = {
-            'measuringworth_british': {
-                name: 'MeasuringWorth - British Official Price',
-                granularity: 'Annual',
-                color: '#8B4513',
-                url: 'https://www.measuringworth.com/datasets/gold/',
-                description: 'Oldest gold price data available'
-            },
-            'measuringworth_london': {
-                name: 'MeasuringWorth - London Market Price',
-                granularity: 'Annual',
-                color: '#DAA520',
-                url: 'https://www.measuringworth.com/datasets/gold/',
-                description: 'London market price from 1718'
-            },
-            'worldbank': {
-                name: 'World Bank Commodity Prices',
-                granularity: 'Monthly',
-                color: '#FFD700',
-                url: 'https://www.worldbank.org/en/research/commodity-markets',
-                description: 'Pink Sheet gold prices (1960-2024)'
-            },
-            'yahoo_finance': {
-                name: 'Yahoo Finance - Gold Futures',
-                granularity: 'Daily',
-                color: '#FFA500',
-                url: 'https://finance.yahoo.com/quote/GC=F',
-                description: 'Current gold futures prices (2025-present)'
+        // Load metadata and update live stats
+        async function loadMetadata() {
+            try {
+                const response = await fetch('data/generation_metadata.json');
+                const metadata = await response.json();
+
+                // Update last updated time
+                if (metadata.generated_at) {
+                    const date = new Date(metadata.generated_at);
+                    const now = new Date();
+                    const hoursAgo = Math.floor((now - date) / (1000 * 60 * 60));
+
+                    if (hoursAgo < 1) {
+                        document.getElementById('updateTime').textContent = 'Just now';
+                    } else if (hoursAgo < 24) {
+                        document.getElementById('updateTime').textContent = `${hoursAgo}h ago`;
+                    } else {
+                        const daysAgo = Math.floor(hoursAgo / 24);
+                        document.getElementById('updateTime').textContent = `${daysAgo}d ago`;
+                    }
+                }
+
+                // Update latest price
+                if (metadata.most_recent_data?.yahoo_finance_gold?.latest_price) {
+                    const price = metadata.most_recent_data.yahoo_finance_gold.latest_price;
+                    document.getElementById('latestPrice').textContent = `$${price.toFixed(2)}`;
+                }
+
+                // Update gold/silver ratio
+                if (metadata.most_recent_data?.gold_silver_ratio?.latest_ratio) {
+                    const ratio = metadata.most_recent_data.gold_silver_ratio.latest_ratio;
+                    document.getElementById('latestRatio').textContent = ratio.toFixed(1);
+                }
+            } catch (error) {
+                console.error('Error loading metadata:', error);
+                document.getElementById('updateTime').textContent = 'N/A';
+                document.getElementById('latestPrice').textContent = 'N/A';
+                document.getElementById('latestRatio').textContent = 'N/A';
             }
-        };
+        }
 
-        // Load and display data
-        Promise.all([
-            fetch('data/source_ranges_full.json').then(r => r.json()),
-            fetch('data/source_stats.json').then(r => r.json())
-        ])
-            .then(([fullRanges, usedStats]) => {
-                console.log('Loaded full ranges:', fullRanges);
-                console.log('Loaded used stats:', usedStats);
-                createTimeline(fullRanges);
-                createLegend(fullRanges, usedStats);
-                createCoverageSummary(usedStats);
-            })
-            .catch(error => {
-                console.error('Error loading source data:', error);
-                const isFileProtocol = window.location.protocol === 'file:';
-                const errorMsg = isFileProtocol
-                    ? '<p style="color: #d9534f; text-align: center;"><strong>CORS Error:</strong> This page must be served via HTTP/HTTPS to load data.<br>Run <code>python -m http.server</code> in the project directory and visit <code>http://localhost:8000</code></p>'
-                    : '<p style="color: #999; text-align: center;">Source statistics will appear here after running the update script.</p>';
-                document.getElementById('legendContainer').innerHTML = errorMsg;
-            });
+        // Create timeline visualization
+        async function createTimeline() {
+            try {
+                const response = await fetch('data/source_ranges_full.json');
+                const sources = await response.json();
 
-        function createTimeline(stats) {
-            const ctx = document.getElementById('timelineChart').getContext('2d');
+                const ctx = document.getElementById('timelineChart').getContext('2d');
 
-            const datasets = Object.entries(stats).map(([source, data]) => {
-                const metadata = sourceMetadata[source] || {};
-                const startYear = parseInt(data.start.split('-')[0]);
-                const endYear = parseInt(data.end.split('-')[0]);
-
-                return {
-                    label: metadata.name || source,
-                    data: [{
-                        x: [new Date(startYear, 0, 1), new Date(endYear, 11, 31)],
-                        y: metadata.name || source
-                    }],
-                    backgroundColor: metadata.color || '#999',
-                    borderColor: '#333',
-                    borderWidth: 2,
-                    barThickness: 40
+                // Prepare data for chart
+                const datasets = [];
+                const colors = {
+                    'measuringworth_british': '#8B4513',
+                    'measuringworth_london': '#DAA520',
+                    'worldbank': '#FFD700',
+                    'yahoo_finance': '#32CD32',
+                    'yahoo_silver': '#C0C0C0',
+                    'gold_silver_ratio': '#B8B8B8',
+                    'dollar_pound_exchange': '#4169E1'
                 };
-            });
 
-            new Chart(ctx, {
-                type: 'bar',
-                data: { datasets },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Data Source Coverage Timeline (1200 - Present)',
-                            font: { size: 18 }
+                const labels = {
+                    'measuringworth_british': 'British Official',
+                    'measuringworth_london': 'London Market',
+                    'worldbank': 'World Bank',
+                    'yahoo_finance': 'Gold Futures',
+                    'yahoo_silver': 'Silver Futures',
+                    'gold_silver_ratio': 'Gold/Silver Ratio',
+                    'dollar_pound_exchange': 'USD/GBP Exchange'
+                };
+
+                Object.entries(sources).forEach(([key, data]) => {
+                    const startYear = parseInt(data.start.split('-')[0]);
+                    const endYear = parseInt(data.end.split('-')[0]);
+
+                    datasets.push({
+                        label: labels[key] || key,
+                        data: [{
+                            x: startYear,
+                            y: Object.keys(sources).indexOf(key)
+                        }, {
+                            x: endYear,
+                            y: Object.keys(sources).indexOf(key)
+                        }],
+                        borderColor: colors[key] || '#999',
+                        backgroundColor: colors[key] || '#999',
+                        borderWidth: 8,
+                        pointRadius: 4,
+                        showLine: true
+                    });
+                });
+
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: { datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: {
+                                    display: true,
+                                    text: 'Year'
+                                },
+                                min: 1250,
+                                max: 2030
+                            },
+                            y: {
+                                type: 'linear',
+                                display: false,
+                                min: -1,
+                                max: Object.keys(sources).length
+                            }
                         },
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const start = new Date(context.raw.x[0]);
-                                    const end = new Date(context.raw.x[1]);
-                                    const years = end.getFullYear() - start.getFullYear() + 1;
-                                    return [
-                                        `${context.dataset.label}`,
-                                        `Range: ${start.getFullYear()} - ${end.getFullYear()}`,
-                                        `Years covered: ${years}`
-                                    ];
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const source = sources[Object.keys(sources)[context.parsed.y]];
+                                        return `${context.dataset.label}: ${source.start} to ${source.end} (${source.count} records)`;
+                                    }
                                 }
                             }
                         }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'year',
-                                displayFormats: { year: 'yyyy' }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Year',
-                                font: { size: 14 }
-                            },
-                            min: new Date(1200, 0, 1),
-                            max: new Date(new Date().getFullYear() + 1, 0, 1)
-                        },
-                        y: {
-                            type: 'category',
-                            title: {
-                                display: true,
-                                text: 'Data Source',
-                                font: { size: 14 }
-                            }
-                        }
                     }
-                }
-            });
+                });
+
+                // Add source details below chart
+                const detailsDiv = document.getElementById('sourceDetails');
+                let html = '<h3>Data Coverage Details</h3>';
+
+                Object.entries(sources).forEach(([key, data]) => {
+                    html += `<p><strong>${labels[key] || key}:</strong> ${data.count.toLocaleString()} records (${data.start} to ${data.end})</p>`;
+                });
+
+                detailsDiv.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error creating timeline:', error);
+                document.getElementById('timelineChart').style.display = 'none';
+                document.getElementById('sourceDetails').innerHTML = '<p>Timeline data will be available after first data update.</p>';
+            }
         }
 
-        function createLegend(fullRanges, usedStats) {
-            const legendHtml = Object.entries(fullRanges).map(([source, fullData]) => {
-                const metadata = sourceMetadata[source] || {};
-                const usedData = usedStats[source] || fullData;
-
-                const fullStartYear = parseInt(fullData.start.split('-')[0]);
-                const fullEndYear = parseInt(fullData.end.split('-')[0]);
-                const fullYears = fullEndYear - fullStartYear + 1;
-
-                const usedStartYear = parseInt(usedData.start.split('-')[0]);
-                const usedEndYear = parseInt(usedData.end.split('-')[0]);
-                const usedYears = usedEndYear - usedStartYear + 1;
-
-                return `
-                    <div class="legend-item" style="border-left-color: ${metadata.color || '#999'};">
-                        <h3>${metadata.name || source}</h3>
-                        <p class="granularity">${metadata.granularity || 'Unknown'} granularity</p>
-                        <p><strong>Full coverage:</strong> ${fullData.start} to ${fullData.end} (${fullData.count.toLocaleString()} records, ${fullYears.toLocaleString()} years)</p>
-                        <p><strong>Used in dataset:</strong> ${usedData.count.toLocaleString()} records from ${usedData.start} to ${usedData.end} (${usedYears.toLocaleString()} years)</p>
-                        <p>${metadata.description || ''}</p>
-                        ${metadata.url ? `<p><a href="${metadata.url}" target="_blank">Visit source →</a></p>` : ''}
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('legendContainer').innerHTML = legendHtml;
-        }
-
-        function createCoverageSummary(usedStats) {
-            const summaryHtml = Object.entries(usedStats).map(([source, stats]) => {
-                const metadata = sourceMetadata[source] || {};
-                const sourceName = metadata.name || source;
-                return `
-                    <li><strong>${sourceName}</strong>: ${stats.count.toLocaleString()} records (${stats.start} to ${stats.end})
-                        <a href="data/backfill/${source}_latest.csv">[download raw data]</a></li>
-                `;
-            }).join('');
-
-            document.getElementById('coverageSummary').innerHTML = summaryHtml;
-        }
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMetadata();
+            createTimeline();
+        });
     </script>
 </body>
 </html>

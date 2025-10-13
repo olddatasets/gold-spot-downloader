@@ -57,6 +57,39 @@
       "requires_api_key": false,
       "notes": "Gold futures (GC=F) from Yahoo Finance. Fills gap from 2025-present. Free, no API key required."
     },
+    "yahoo_silver": {
+      "enabled": true,
+      "granularity": "daily",
+      "date_range": {
+        "start": "2025-01-01",
+        "end": "auto"
+      },
+      "url": "https://finance.yahoo.com/quote/SI=F",
+      "requires_api_key": false,
+      "notes": "Silver futures (SI=F) from Yahoo Finance. Used to calculate current gold/silver ratios (2025-present). Free, no API key required."
+    },
+    "dollar_pound_exchange": {
+      "enabled": true,
+      "granularity": "annual",
+      "date_range": {
+        "start": "1791-01-01",
+        "end": "auto"
+      },
+      "url": "https://www.measuringworth.com/datasets/exchangepound/",
+      "requires_api_key": false,
+      "notes": "USD/GBP exchange rate from MeasuringWorth (1791-present). Shows number of USD per British pound."
+    },
+    "gold_silver_ratio": {
+      "enabled": true,
+      "granularity": "annual",
+      "date_range": {
+        "start": "1687-01-01",
+        "end": "auto"
+      },
+      "url": "https://www.measuringworth.com/datasets/gold/",
+      "requires_api_key": false,
+      "notes": "Gold/Silver price ratio from MeasuringWorth (1687-present). Shows ounces of silver per ounce of gold."
+    },
     "wikipedia": {
       "enabled": false,
       "granularity": "5-year",
