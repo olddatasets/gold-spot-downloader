@@ -53,6 +53,20 @@ jobs:
         echo "Files to deploy:"
         ls -la deploy/
 
+    - name: Deploy to Surge.sh
+      run: |
+        # Install surge
+        npm install -g surge
+
+        # Deploy to surge with PR-specific domain
+        export SURGE_DOMAIN="gold-api-pr-${{ github.event.pull_request.number }}.surge.sh"
+
+        # Deploy without login (using token)
+        surge ./deploy https://$SURGE_DOMAIN --token ${{ secrets.SURGE_TOKEN }}
+
+        echo "PREVIEW_URL=https://$SURGE_DOMAIN" >> $GITHUB_ENV
+      continue-on-error: true
+
     - name: Upload preview artifact
       uses: actions/upload-artifact@v4
       with:
@@ -60,29 +74,36 @@ jobs:
         path: deploy/
         retention-days: 7
 
-    - name: Comment PR with artifact link
+    - name: Comment PR with preview link
       uses: actions/github-script@v7
       with:
         script: |
+          const surgeUrl = process.env.PREVIEW_URL || null;
           const artifactURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
-          const comment = `## 📦 Preview Build Ready!
+          let comment = `## 🚀 Preview Ready!\n\n`;
 
-          A preview of the GitHub Pages site has been generated for this PR.
+          if (surgeUrl) {
+            comment += `### 🌐 Live Preview\n`;
+            comment += `**[View Live Preview](${surgeUrl})** ← Click here to see the site\n\n`;
+            comment += `The preview includes:\n`;
+            comment += `- Latest gold price data (fetched fresh)\n`;
+            comment += `- All generated CSV files\n`;
+            comment += `- Full interactive website\n\n`;
+          }
 
-          **Download the preview artifact:** [pr-preview-${{ github.event.pull_request.number }}](${artifactURL})
+          comment += `### 📦 Download Preview\n`;
+          comment += `[Download preview artifact](${artifactURL}) (pr-preview-${{ github.event.pull_request.number }})\n\n`;
 
-          To view the preview locally:
-          1. Download and extract the artifact
-          2. Run \`python -m http.server 8000\` in the extracted directory
-          3. Visit http://localhost:8000
+          if (!surgeUrl) {
+            comment += `To view locally:\n`;
+            comment += `1. Download and extract the artifact\n`;
+            comment += `2. Run \`python -m http.server 8000\` in the extracted directory\n`;
+            comment += `3. Visit http://localhost:8000\n\n`;
+            comment += `*Note: Set SURGE_TOKEN secret in repository settings for live preview links.*\n`;
+          }
 
-          The preview includes:
-          - Latest gold price data (fetched fresh)
-          - All generated CSV files
-          - Full interactive website
-
-          ⚠️ **Note:** This is a preview build only. The actual deployment will happen when this PR is merged.`;
+          comment += `\n⚠️ **Note:** This preview will be deleted when the PR is closed or merged.`;
 
           // Find existing comment
           const { data: comments } = await github.rest.issues.listComments({
@@ -93,7 +114,7 @@ jobs:
 
           const botComment = comments.find(comment =>
             comment.user.type === 'Bot' &&
-            comment.body.includes('Preview Build Ready')
+            comment.body.includes('Preview Ready')
           );
 
           if (botComment) {
