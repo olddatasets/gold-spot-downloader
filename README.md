@@ -2,7 +2,7 @@
 
 **Free, comprehensive historical gold price data spanning 768 years (1258-2025)**
 
-[![Update Gold Price Data](https://github.com/posix4e/gold-spot-downloader/actions/workflows/update-data.yml/badge.svg)](https://github.com/posix4e/gold-spot-downloader/actions/workflows/update-data.yml)
+[![Update Gold Price Data](https://github.com/olddatasets/gold-spot-downloader/actions/workflows/update-data.yml/badge.svg)](https://github.com/olddatasets/gold-spot-downloader/actions/workflows/update-data.yml)
 
 📊 **Live site:** [freegoldapi.com](https://freegoldapi.com)
 
@@ -99,7 +99,7 @@ Runs daily at 6 AM UTC to fetch and publish updated data.
 
 ```bash
 # Clone repository
-git clone https://github.com/posix4e/gold-spot-downloader.git
+git clone https://github.com/olddatasets/gold-spot-downloader.git
 cd gold-spot-downloader
 
 # Install dependencies
@@ -181,7 +181,7 @@ Potential improvements:
 
 ## Support
 
-- 🐛 **Issues:** [GitHub Issues](https://github.com/posix4e/gold-spot-downloader/issues)
+- 🐛 **Issues:** [GitHub Issues](https://github.com/olddatasets/gold-spot-downloader/issues)
 - 📧 **Contact:** Open an issue for questions
 
 ## Acknowledgments
