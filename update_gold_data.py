@@ -564,6 +564,15 @@ def save_csv(df, source_stats=None, output_dir="data"):
     df_output.to_csv(latest_path, index=False)
     print(f"Data also saved to {latest_path}")
 
+    # Also save as JSON for CORS-friendly access
+    latest_json_path = os.path.join(output_dir, "latest.json")
+    df_output_for_json = df_output.copy()
+    df_output_for_json["date"] = df_output_for_json["date"].astype(str)
+    df_output_json = df_output_for_json.to_dict(orient="records")
+    with open(latest_json_path, "w") as f:
+        json.dump(df_output_json, f, indent=2)
+    print(f"Data also saved to {latest_json_path}")
+
     if source_stats:
         stats_path = os.path.join(output_dir, "source_stats.json")
         with open(stats_path, "w") as f:
