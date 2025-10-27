@@ -367,46 +367,41 @@
 
                     <h3>Endpoint URL</h3>
                     <div class="code-block">
-https://freegoldapi.com/api/latest.json
+https://freegoldapi.com/data/latest.json
                     </div>
 
                     <h3>Response Format</h3>
                     <div class="code-block">
-{<br>
-  "data": [<br>
-    {<br>
-      "date": "1258",<br>
-      "price": "0.96",<br>
-      "source": "measuringworth_british"<br>
-    },<br>
-    ...<br>
-  ],<br>
-  "metadata": {<br>
-    "total_records": 1678,<br>
-    "date_range": {<br>
-      "start": "1258",<br>
-      "end": "2025-07-01"<br>
-    },<br>
-    "last_updated": "2025-01-15T06:00:00Z"<br>
-  }<br>
-}
+[<br>
+  {<br>
+    "date": "1258-01-01",<br>
+    "price": 0.89,<br>
+    "source": "measuringworth_british (GBP)"<br>
+  },<br>
+  {<br>
+    "date": "1259-01-01",<br>
+    "price": 0.89,<br>
+    "source": "measuringworth_british (GBP)"<br>
+  },<br>
+  ...<br>
+]
                     </div>
 
                     <h3>Example Usage</h3>
 
                     <h4>JavaScript (Fetch API)</h4>
                     <div class="code-block">
-fetch('https://freegoldapi.com/api/latest.json')<br>
+fetch('https://freegoldapi.com/data/latest.json')<br>
   .then(response => response.json())<br>
   .then(data => {<br>
-    console.log(`Total records: ${data.metadata.total_records}`);<br>
+    console.log(`Total records: ${data.length}`);<br>
     <br>
     <span class="code-comment">// Get latest price</span><br>
-    const latest = data.data[data.data.length - 1];<br>
+    const latest = data[data.length - 1];<br>
     console.log(`Latest: $${latest.price} on ${latest.date}`);<br>
     <br>
     <span class="code-comment">// Filter by year</span><br>
-    const year2020 = data.data.filter(d => d.date.startsWith('2020'));<br>
+    const year2020 = data.filter(d => d.date.startsWith('2020'));<br>
   });
                     </div>
 
@@ -414,27 +409,27 @@ fetch('https://freegoldapi.com/api/latest.json')<br>
                     <div class="code-block">
 import requests<br>
 <br>
-response = requests.get('https://freegoldapi.com/api/latest.json')<br>
+response = requests.get('https://freegoldapi.com/data/latest.json')<br>
 data = response.json()<br>
 <br>
-<span class="code-comment"># Access metadata</span><br>
-print(f"Total records: {data['metadata']['total_records']}")<br>
+<span class="code-comment"># Get total records</span><br>
+print(f"Total records: {len(data)}")<br>
 <br>
 <span class="code-comment"># Get latest price</span><br>
-latest = data['data'][-1]<br>
+latest = data[-1]<br>
 print(f"Latest: ${latest['price']} on {latest['date']}")
                     </div>
 
                     <h4>curl</h4>
                     <div class="code-block">
 <span class="code-comment"># Get full JSON response</span><br>
-curl -s https://freegoldapi.com/api/latest.json<br>
+curl -s https://freegoldapi.com/data/latest.json<br>
 <br>
-<span class="code-comment"># Extract just metadata</span><br>
-curl -s https://freegoldapi.com/api/latest.json | jq '.metadata'<br>
+<span class="code-comment"># Count total records</span><br>
+curl -s https://freegoldapi.com/data/latest.json | jq 'length'<br>
 <br>
 <span class="code-comment"># Get latest price</span><br>
-curl -s https://freegoldapi.com/api/latest.json | jq '.data[-1]'
+curl -s https://freegoldapi.com/data/latest.json | jq '.[-1]'
                     </div>
 
                     <h3>Features</h3>
@@ -442,7 +437,7 @@ curl -s https://freegoldapi.com/api/latest.json | jq '.data[-1]'
                         <li><strong>CORS Enabled:</strong> Call directly from browser JavaScript</li>
                         <li><strong>No API Key Required:</strong> Free and open access</li>
                         <li><strong>Same Data as CSV:</strong> Identical to data/latest.csv</li>
-                        <li><strong>Metadata Included:</strong> Total records, date ranges, update timestamps</li>
+                        <li><strong>Simple Array Format:</strong> Easy to parse and filter</li>
                         <li><strong>Daily Updates:</strong> Synchronized with CSV updates at 6 AM UTC</li>
                     </ul>
                 </div>
